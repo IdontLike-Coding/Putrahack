@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (targetScreen) {
       targetScreen.classList.add('active');
       targetScreen.style.display = 'block'; 
-      // If history screen, fetch fresh data
-      if (targetId === 'history') fetchHistory();
+      // If advice/history screen, fetch fresh data
+      if (targetId === 'advice') fetchHistory();
       if (targetId === 'field') fetchFields();
     }
     const targetNav = document.querySelector(`[data-target="${targetId}"].nav-item`);
@@ -320,7 +320,8 @@ document.addEventListener('DOMContentLoaded', () => {
           riskClass: result.riskClass,
           confidence: result.confidence,
           factor: result.factor,
-          suggestion: result.suggestion
+          suggestion: result.suggestion,
+          image_data: result.image_data
         })
       });
       return await response.json();
@@ -341,8 +342,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       data.forEach(item => {
         const date = new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-        container.innerHTML += `
-          <div class="history-item">
+        
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+          <div class="history-header">
             <div class="history-icon-box ${item.risk_class}">
               <span class="material-symbols-rounded">${item.risk_class === 'safe' ? 'check_circle' : 'warning'}</span>
             </div>
@@ -353,7 +357,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="history-meta">
               <span>${date}</span>
             </div>
-          </div>`;
+          </div>
+          <div class="history-details">
+            ${item.image_data ? `<div class="history-image-wrap"><img src="${item.image_data}" alt="Scanned Plant" class="history-scan-img"></div>` : ''}
+            <div class="detail-section">
+              <strong>Contributing Factor:</strong>
+              <p>${item.factor}</p>
+            </div>
+            <div class="detail-section">
+              <strong>Treatment Plan:</strong>
+              <p>${item.suggestion}</p>
+            </div>
+          </div>
+        `;
+        
+        // Add click listener for expansion
+        historyItem.querySelector('.history-header').addEventListener('click', () => {
+          historyItem.classList.toggle('expanded');
+        });
+        
+        container.appendChild(historyItem);
       });
     } catch (e) {
       container.innerHTML = `<p class="alert-desc" style="color:red;">Failed to connect to cloud database.</p>`;
@@ -397,20 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
     safeSet('sensor-moisture', data.sensors.moisture);
     safeSet('sensor-ph', data.sensors.ph);
     safeSet('sensor-wind', data.sensors.wind);
-
-    const adviceList = document.getElementById('advice-list');
-    if(adviceList) {
-      adviceList.innerHTML = '';
-      data.advice.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'advice-card mt-3';
-        card.innerHTML = `<div class="advice-header ${item.type}"><span class="material-symbols-rounded">${item.icon}</span><span>${item.title}</span></div>
-          <p class="advice-text">${item.desc}</p><div class="advice-meta"><span class="material-symbols-rounded">schedule</span> Today</div>
-          <button class="primary-btn sm-btn">Mark Done</button>`;
-        card.querySelector('button').addEventListener('click', () => { card.style.opacity = '0'; setTimeout(() => card.remove(), 300); });
-        adviceList.appendChild(card);
-      });
-    }
 
     // Render 7-Day Forecast
     const forecastTimeline = document.getElementById('forecast-timeline');
@@ -577,25 +586,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${Math.round(89 + randomStability + (base * 5))}%`;
     };
 
+    const imgBase64 = canvas.toDataURL('image/jpeg', 0.5);
+
     // Decision Priority (Calibrated for the USM Putrahack Demo)
     // 1. Check for severe browning first (Drought/Blight)
     if (bRat > 0.05) {
-        return { ...DIAGNOSIS_DB.blight, confidence: generateConfidence(bRat) }; 
+        return { ...DIAGNOSIS_DB.blight, confidence: generateConfidence(bRat), image_data: imgBase64 }; 
     }
     // 2. Check for light browning/wilting
     if (bRat > 0.015) {
-        return { ...DIAGNOSIS_DB.wilted, confidence: generateConfidence(bRat) }; 
+        return { ...DIAGNOSIS_DB.wilted, confidence: generateConfidence(bRat), image_data: imgBase64 }; 
     }
     // 3. Check for specific Nutrient yellowing
     if (yRat > 0.05) {
-        return { ...DIAGNOSIS_DB.nutrient, confidence: generateConfidence(yRat) }; 
+        return { ...DIAGNOSIS_DB.nutrient, confidence: generateConfidence(yRat), image_data: imgBase64 }; 
     }
     // 4. Check for Pests (Elevated threshold to avoid crinkle false-positives)
     if (noise > 0.15) {
-        return { ...DIAGNOSIS_DB.pest, confidence: generateConfidence(noise) }; 
+        return { ...DIAGNOSIS_DB.pest, confidence: generateConfidence(noise), image_data: imgBase64 }; 
     }
     
-    return { ...DIAGNOSIS_DB.healthy, confidence: "98.4%" };
+    return { ...DIAGNOSIS_DB.healthy, confidence: "98.4%", image_data: imgBase64 };
   }
 
   const startScanBtn = document.getElementById('start-scan-btn');

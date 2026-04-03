@@ -71,11 +71,11 @@ app.get('/api/history', async (req, res) => {
 
 // 2. Save New Diagnosis
 app.post('/api/diagnose', async (req, res) => {
-  const { label, risk, riskClass, confidence, factor, suggestion } = req.body;
+  const { label, risk, riskClass, confidence, factor, suggestion, image_data } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO diagnoses (label, risk, risk_class, confidence, factor, suggestion) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [label, risk, riskClass, confidence, factor, suggestion]
+      'INSERT INTO diagnoses (label, risk, risk_class, confidence, factor, suggestion, image_data) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [label, risk, riskClass, confidence, factor, suggestion, image_data]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {

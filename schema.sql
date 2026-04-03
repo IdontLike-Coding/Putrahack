@@ -22,6 +22,7 @@ CREATE TABLE diagnoses (
     confidence VARCHAR(50) NOT NULL,
     factor TEXT,
     suggestion TEXT,
+    image_data TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
