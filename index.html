@@ -99,7 +99,7 @@
               <select id="field-selector" class="field-select">
                 <option value="">Loading Fields...</option>
               </select>
-              <button class="icon-btn sm-btn" id="add-field-btn" title="Add New Field">
+              <button class="add-field-btn" id="add-field-btn" title="Add New Field">
                 <span class="material-symbols-rounded">add_location</span>
               </button>
             </div>
@@ -219,7 +219,12 @@
           <label>Field Name</label>
           <input type="text" id="new-field-name" placeholder="e.g. Sector D">
           <label class="mt-2">Location Name</label>
-          <input type="text" id="new-field-loc" placeholder="e.g. Selangor, MY">
+          <div class="row-sm">
+            <input type="text" id="new-field-loc" placeholder="e.g. Selangor, MY" style="flex: 1;">
+            <button id="use-gps-btn" class="icon-btn" title="Use Current Location">
+              <span class="material-symbols-rounded">my_location</span>
+            </button>
+          </div>
           <div id="geocode-status" class="geocode-status hidden">Resolving coordinates...</div>
           <div id="coords-preview" class="row mt-2 hidden">
             <div class="flex-1">

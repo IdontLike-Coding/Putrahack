@@ -272,6 +272,42 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('add-field-btn')?.addEventListener('click', () => fieldModal.classList.remove('hidden'));
   document.getElementById('cancel-field-btn')?.addEventListener('click', () => fieldModal.classList.add('hidden'));
 
+  document.getElementById('use-gps-btn')?.addEventListener('click', () => {
+    const status = document.getElementById('geocode-status');
+    if (status) {
+      status.textContent = "Fetching your location...";
+      status.classList.remove('hidden');
+    }
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      document.getElementById('new-field-lat').value = latitude.toFixed(4);
+      document.getElementById('new-field-lon').value = longitude.toFixed(4);
+      
+      const preview = document.getElementById('coords-preview');
+      if (preview) preview.classList.remove('hidden');
+      
+      // Attempt reverse geocoding to get a name
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        if (data && data.display_name) {
+          const parts = data.display_name.split(',');
+          // Use a concise version (City, State)
+          const shortLoc = parts.slice(0, 3).join(',').trim();
+          document.getElementById('new-field-loc').value = shortLoc;
+        }
+      } catch (e) {
+        console.error("Reverse geocoding failed", e);
+      }
+      
+      if (status) status.classList.add('hidden');
+    }, (err) => {
+      if (status) status.textContent = "Location access denied.";
+      console.error(err);
+    });
+  });
+
   // Geocoding Helper
   async function geocodeLocation(name) {
     const status = document.getElementById('geocode-status');

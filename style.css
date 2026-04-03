@@ -159,6 +159,12 @@ body {
   margin-bottom: 24px;
 }
 .flex-1 { flex: 1; }
+.row-sm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
 
 /* Cards */
 .card {
@@ -331,6 +337,29 @@ body {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.add-field-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.add-field-btn:hover {
+  background: var(--primary-light);
+  transform: scale(1.08);
+}
+.add-field-btn .material-symbols-rounded {
+  font-size: 20px;
 }
 
 .field-select {
@@ -601,10 +630,14 @@ video.camera-feed {
   color: var(--primary);
 }
 .sm-btn {
-  padding: 10px 20px;
-  font-size: 14px;
-  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
   width: auto;
+  gap: 4px;
+}
+.sm-btn .material-symbols-rounded {
+  font-size: 18px;
 }
 
 
