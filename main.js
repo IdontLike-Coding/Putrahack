@@ -1,4 +1,4 @@
-// main.js - Logic for AgriGuard AI Mobile Prototype
+// main.js - Logic for AgriGuard Mobile Prototype
 import * as tf from '@tensorflow/tfjs';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       targetScreen.style.display = 'block'; 
       // If history screen, fetch fresh data
       if (targetId === 'history') fetchHistory();
-      if (targetId === 'field') fetchSensors();
+      if (targetId === 'field') fetchFields();
     }
     const targetNav = document.querySelector(`[data-target="${targetId}"].nav-item`);
     if (targetNav) targetNav.classList.add('active');
@@ -140,12 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const API_URL = 'http://localhost:3001/api';
 
   // --- Backend Integration ---
+  // --- Backend Integration ---
   async function saveSensorsToCloud(sensors) {
     try {
       await fetch(`${API_URL}/sensors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          field_id: sensors.field_id,
+          field_name: sensors.field_name,
           temperature: parseFloat(sensors.temp),
           moisture: parseFloat(sensors.moisture),
           ph: parseFloat(sensors.ph),
@@ -155,27 +158,156 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) { console.error("Sensor sync failed", e); }
   }
 
-  async function fetchSensors() {
+  // --- Field Management Logic ---
+  let fieldsList = [];
+  let selectedFieldId = null;
+
+  async function fetchFields() {
     try {
-      const res = await fetch(`${API_URL}/sensors/latest`);
-      const data = await res.json();
-      
-      // Update the live scenario with real data
-      SCENARIOS.live.sensors = {
-        temp: `${data.temperature}°C`,
-        moisture: `${data.moisture}%`,
-        ph: `${data.ph}`,
-        wind: `${data.wind_speed} km/h`
-      };
-      
-      if (currentScenario === 'live') {
-        const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-        safeSet('sensor-temp', SCENARIOS.live.sensors.temp);
-        safeSet('sensor-moisture', SCENARIOS.live.sensors.moisture);
-        safeSet('sensor-ph', SCENARIOS.live.sensors.ph);
-        safeSet('sensor-wind', SCENARIOS.live.sensors.wind);
+      const res = await fetch(`${API_URL}/fields`);
+      fieldsList = await res.json();
+      populateFieldSelector();
+      if (fieldsList.length > 0 && !selectedFieldId) {
+        selectedFieldId = fieldsList[0].id;
+        updateSelection(fieldsList[0]);
+      } else if (selectedFieldId) {
+        const current = fieldsList.find(f => f.id == selectedFieldId);
+        if (current) updateSelection(current);
       }
-    } catch (e) { console.error("Sensor fetch failed", e); }
+    } catch (e) { console.error("Failed to fetch fields", e); }
+  }
+
+  function populateFieldSelector() {
+    const selector = document.getElementById('field-selector');
+    if (!selector) return;
+    selector.innerHTML = fieldsList.map(f => `<option value="${f.id}" ${f.id == selectedFieldId ? 'selected' : ''}>${f.name} (${f.location.split(',')[0]})</option>`).join('');
+  }
+
+  function updateSelection(field) {
+    document.getElementById('field-name-display').textContent = field.name;
+    document.getElementById('field-location-display').textContent = field.location;
+    
+    fetchRealWeather(field);
+  }
+
+  async function fetchRealWeather(field) {
+    try {
+      // Fetch climate (temp, humidity) from Open-Meteo and wind from Windy.com in parallel
+      const [climateRes, windRes] = await Promise.all([
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${field.latitude}&longitude=${field.longitude}&current=temperature_2m,relative_humidity_2m`),
+        fetch(`${API_URL}/weather/wind?lat=${field.latitude}&lon=${field.longitude}`)
+      ]);
+
+      const climateData = await climateRes.json();
+      const windData = await windRes.json();
+      const cur = climateData.current;
+      
+      const sensorData = {
+        temp: cur.temperature_2m,
+        moisture: cur.relative_humidity_2m,
+        ph: (6.2 + Math.random() * 0.8).toFixed(1),
+        wind: windData.speed || 0,
+        windGust: windData.gust || 0,
+        windDir: windData.directionLabel || '--',
+        windSource: windData.source || 'N/A'
+      };
+
+      updateSensorUI(sensorData);
+      classifyFieldRisk(sensorData);
+      
+      // Auto-save to cloud for persistence
+      saveSensorsToCloud({ field_id: field.id, field_name: field.name, ...sensorData });
+    } catch (e) { console.error("Weather API failed", e); }
+  }
+
+  function updateSensorUI(s) {
+    const safeSet = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    safeSet('sensor-temp', `${s.temp}°C`);
+    safeSet('sensor-moisture', `${s.moisture}%`);
+    safeSet('sensor-ph', s.ph);
+    safeSet('sensor-wind', `${s.wind} km/h ${s.windDir || ''}`);
+
+    // Update wind gust if element exists
+    const gustEl = document.getElementById('sensor-wind-gust');
+    if (gustEl) gustEl.textContent = `Gust: ${s.windGust || 0} km/h`;
+  }
+
+  function classifyFieldRisk(s) {
+    const badge = document.getElementById('field-risk-badge');
+    if (!badge) return;
+    let risk = "Healthy"; let riskClass = "safe";
+    if (s.temp > 35 || s.moisture < 20) { risk = "Danger"; riskClass = "danger"; }
+    else if (s.temp > 32 || s.moisture < 35) { risk = "Warning"; riskClass = "warning"; }
+    badge.textContent = risk; badge.className = `result-badge ${riskClass}`;
+  }
+
+  // Event Listeners for Field Management
+  document.getElementById('field-selector')?.addEventListener('change', (e) => {
+    selectedFieldId = e.target.value;
+    const field = fieldsList.find(f => f.id == selectedFieldId);
+    if (field) updateSelection(field);
+  });
+
+  const fieldModal = document.getElementById('field-modal');
+  document.getElementById('add-field-btn')?.addEventListener('click', () => fieldModal.classList.remove('hidden'));
+  document.getElementById('cancel-field-btn')?.addEventListener('click', () => fieldModal.classList.add('hidden'));
+
+  // Geocoding Helper
+  async function geocodeLocation(name) {
+    const status = document.getElementById('geocode-status');
+    const preview = document.getElementById('coords-preview');
+    if (!status || !preview) return;
+
+    status.classList.remove('hidden');
+    preview.classList.add('hidden');
+
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}`);
+      const data = await res.json();
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        document.getElementById('new-field-lat').value = parseFloat(lat).toFixed(4);
+        document.getElementById('new-field-lon').value = parseFloat(lon).toFixed(4);
+        status.classList.add('hidden');
+        preview.classList.remove('hidden');
+      } else {
+        status.textContent = "Location not found. Please try again.";
+      }
+    } catch (e) {
+      status.textContent = "Geocoding failed. Using fallback.";
+      console.error(e);
+    }
+  }
+
+  document.getElementById('new-field-loc')?.addEventListener('blur', (e) => {
+    if (e.target.value.trim()) geocodeLocation(e.target.value.trim());
+  });
+
+  document.getElementById('save-field-btn')?.addEventListener('click', async () => {
+    const name = document.getElementById('new-field-name').value;
+    const location = document.getElementById('new-field-loc').value;
+    const latitude = parseFloat(document.getElementById('new-field-lat').value);
+    const longitude = parseFloat(document.getElementById('new-field-lon').value);
+
+    if (!name || !location || isNaN(latitude)) return alert("Please fill all fields correctly.");
+
+    try {
+      await fetch(`${API_URL}/fields`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, location, latitude, longitude })
+      });
+      fieldModal.classList.add('hidden');
+      fetchFields();
+    } catch (e) { console.error("Save field failed", e); }
+  });
+
+  async function fetchSensors() {
+    // Legacy support or fallback
+    if (selectedFieldId) {
+      const field = fieldsList.find(f => f.id == selectedFieldId);
+      if (field) fetchRealWeather(field);
+    }
   }
   async function saveToCloud(result) {
     try {

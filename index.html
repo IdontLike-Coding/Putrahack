@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>AgriGuard AI</title>
+    <title>AgriGuard</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -140,9 +140,29 @@
 
         <!-- Screen: Field (Sensors) -->
         <section id="screen-field" class="screen">
-          <div class="section-title">Field Sensors (Sector A)</div>
+          <div class="field-header">
+            <div class="section-title">Field Management</div>
+            <div class="field-actions">
+              <select id="field-selector" class="field-select">
+                <option value="">Loading Fields...</option>
+              </select>
+              <button class="icon-btn sm-btn" id="add-field-btn" title="Add New Field">
+                <span class="material-symbols-rounded">add_location</span>
+              </button>
+            </div>
+          </div>
           
-          <div class="sensor-grid">
+          <div class="card field-status-card mt-3">
+            <div class="status-content">
+              <div class="status-main">
+                <span id="field-name-display">Select a Field</span>
+                <div id="field-risk-badge" class="result-badge safe">Analyzing...</div>
+              </div>
+              <p id="field-location-display" class="forecast-subtitle">Choose a location to see real-time data</p>
+            </div>
+          </div>
+          
+          <div class="sensor-grid mt-4">
             <div class="sensor-card">
               <div class="sensor-icon soil"><span class="material-symbols-rounded">device_thermostat</span></div>
               <div class="sensor-label">Soil Temp</div>
@@ -163,29 +183,13 @@
             </div>
             <div class="sensor-card">
               <div class="sensor-icon custom"><span class="material-symbols-rounded">air</span></div>
-              <div class="sensor-label">Wind</div>
+              <div class="sensor-label">Wind <span class="windy-badge">Windy.com</span></div>
               <div class="sensor-value" id="sensor-wind">12 km/h</div>
+              <div class="sensor-sub" id="sensor-wind-gust">Gust: -- km/h</div>
               <div class="sensor-status text-green" id="sensor-wind-status">Normal</div>
             </div>
           </div>
 
-          <div class="section-title mt-4">Satellite NDVI Health Map</div>
-          <div class="card satellite-card">
-            <div class="satellite-map" id="satellite-map">
-              <div class="map-sector healthy" style="top: 20%; left: 20%; width: 30%; height: 40%;">Sector A</div>
-              <div class="map-sector stressed" style="top: 20%; left: 55%; width: 25%; height: 25%;">Sector B</div>
-              <div class="map-sector warning" style="top: 50%; left: 55%; width: 25%; height: 30%;">Sector C</div>
-              <div class="map-overlay">
-                <span class="material-symbols-rounded">satellite_alt</span>
-                <span>Live View: Sector A-C</span>
-              </div>
-            </div>
-            <div class="map-legend">
-              <span class="legend-item"><span class="dot healthy"></span> Healthy</span>
-              <span class="legend-item"><span class="dot warning"></span> At Risk</span>
-              <span class="legend-item"><span class="dot stressed"></span> Stressed</span>
-            </div>
-          </div>
         </section>
 
 
@@ -213,7 +217,7 @@
         <!-- Screen: History (New Backend Screen) -->
         <section id="screen-history" class="screen">
           <div class="section-title">Scan History</div>
-          <p class="forecast-subtitle">Recent AI diagnoses from the Neon database</p>
+          <p class="forecast-subtitle">Recent diagnoses from the Neon database</p>
           
           <div id="history-container" class="history-list">
              <div class="loading-state">
@@ -250,6 +254,35 @@
         </a>
       </nav>
       
+    </div>
+
+    <!-- Add Field Modal -->
+    <div id="field-modal" class="hidden">
+      <div class="demo-card">
+        <h3>Add New Field</h3>
+        <p>Register a new sector for monitoring</p>
+        <div class="form-group mt-3">
+          <label>Field Name</label>
+          <input type="text" id="new-field-name" placeholder="e.g. Sector D">
+          <label class="mt-2">Location Name</label>
+          <input type="text" id="new-field-loc" placeholder="e.g. Selangor, MY">
+          <div id="geocode-status" class="geocode-status hidden">Resolving coordinates...</div>
+          <div id="coords-preview" class="row mt-2 hidden">
+            <div class="flex-1">
+              <label>Latitude</label>
+              <input type="number" id="new-field-lat" readonly>
+            </div>
+            <div class="flex-1 ml-2">
+              <label>Longitude</label>
+              <input type="number" id="new-field-lon" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <button id="save-field-btn" class="primary-btn flex-1">Save Field</button>
+          <button id="cancel-field-btn" class="outline-btn sm-btn ml-2">Cancel</button>
+        </div>
+      </div>
     </div>
 
     <!-- Hidden Demo Controller -->

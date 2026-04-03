@@ -596,82 +596,6 @@ video.camera-feed {
   width: auto;
 }
 
-/* --- Satellite Map --- */
-.satellite-card {
-  padding: 16px;
-  background: var(--surface);
-  margin-bottom: 80px;
-}
-
-.satellite-map {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  background: #1a1a1a;
-  border-radius: var(--radius-md);
-  background-image: url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=40');
-  background-size: cover;
-  background-position: center;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-.map-sector {
-  position: absolute;
-  border: 2px solid rgba(255,255,255,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  transition: transform 0.3s;
-}
-
-.map-sector.healthy { background: rgba(34, 197, 94, 0.4); border-color: #22c55e; }
-.map-sector.warning { background: rgba(234, 179, 8, 0.4); border-color: #eab308; }
-.map-sector.stressed { background: rgba(239, 68, 68, 0.4); border-color: #ef4444; }
-
-.map-overlay {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  padding: 4px 10px;
-  border-radius: 20px;
-  color: white;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.map-legend {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--bg-color);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-.dot.healthy { background: #22c55e; }
-.dot.warning { background: #eab308; }
-.dot.stressed { background: #ef4444; }
 
 .scan-result {
   text-align: center;
@@ -1096,3 +1020,115 @@ video.camera-feed {
 
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Field Management UI */
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.field-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-select {
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: white;
+  color: #111827;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  min-width: 140px;
+}
+
+.field-status-card {
+  padding: 15px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.status-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+
+.row { display: flex; align-items: center; }
+.flex-1 { flex: 1; }
+.ml-2 { margin-left: 8px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+
+/* Modal Styling */
+#field-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-align: left;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.hidden { display: none !important; }
+
+.geocode-status {
+  font-size: 0.75rem;
+  color: var(--primary);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.windy-badge {
+  display: inline-block;
+  background: #1d4ed8;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+  letter-spacing: 0.3px;
+}
+
+.sensor-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

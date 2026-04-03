@@ -1,7 +1,18 @@
--- schema.sql: Database schema for AgriGuard AI
+-- schema.sql: Database schema for AgriGuard
 
--- Drop table if exists to allow re-initialization
+-- Drop tables if exist to allow re-initialization
+DROP TABLE IF EXISTS sensor_readings;
+DROP TABLE IF EXISTS fields;
 DROP TABLE IF EXISTS diagnoses;
+
+CREATE TABLE fields (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    latitude NUMERIC NOT NULL,
+    longitude NUMERIC NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE diagnoses (
     id SERIAL PRIMARY KEY,
@@ -14,12 +25,13 @@ CREATE TABLE diagnoses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Optional: Create a table for field sensors to track historical data
 CREATE TABLE sensor_readings (
     id SERIAL PRIMARY KEY,
+    field_id INTEGER REFERENCES fields(id) ON DELETE CASCADE,
+    field_name VARCHAR(255),
     temperature NUMERIC,
-    moisture NUMERIC,
-    ph NUMERIC,
+    moisture NUMERIC, -- Can maps to Humidity from Weather API
+    ph NUMERIC,       -- Simulated soil pH
     wind_speed NUMERIC,
     captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
