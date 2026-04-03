@@ -38,7 +38,7 @@
         
         <!-- Screen: Dashboard (Home) -->
         <section id="screen-dashboard" class="screen active">
-          <div class="section-title">Home Diagnosis Hub</div>
+          <div class="section-title">Diagnosis Hub</div>
           
           <!-- Leaf Diagnosis Hub (Moved from Scan Screen) -->
           <div class="camera-container" id="camera-view">
@@ -94,48 +94,6 @@
              <button class="outline-btn" id="scan-again-btn">Scan Another</button>
           </div>
 
-          <div class="section-title mt-4">Field Overview</div>
-          <div class="card health-card">
-            <div class="health-info">
-              <h2>Crop Health</h2>
-              <div class="score" id="health-score">88/100</div>
-              <p class="status positive" id="health-status">Stable Condition</p>
-            </div>
-            <div class="health-chart">
-               <span class="material-symbols-rounded eco-icon">eco</span>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="card weather-card flex-1">
-              <div class="card-header">
-                <span class="material-symbols-rounded">partly_cloudy_day</span>
-                <span>Today</span>
-              </div>
-              <div class="weather-temp" id="weather-temp">28°C</div>
-              <div class="weather-desc" id="weather-desc">Humid, 20% Rain</div>
-            </div>
-            
-            <div class="card risk-card flex-1 warning-bg" id="risk-card">
-               <div class="card-header">
-                <span class="material-symbols-rounded" id="risk-icon">warning</span>
-                <span>Risk Level</span>
-              </div>
-              <div class="risk-level" id="risk-level">Medium</div>
-              <div class="risk-desc" id="risk-desc">Heat stress likely</div>
-            </div>
-          </div>
-
-          <div class="section-title">Active Alerts</div>
-          <div class="alert-list" id="alert-list">
-            <div class="alert-item high-risk">
-              <span class="material-symbols-rounded">water_drop</span>
-              <div class="alert-text">
-                <span class="alert-title">Heavy rainfall expected</span>
-                <span class="alert-desc">In 3 days. Improve drainage.</span>
-              </div>
-            </div>
-          </div>
         </section>
 
         <!-- Screen: Field (Sensors) -->
@@ -196,7 +154,23 @@
 
         <!-- Screen: Forecast -->
         <section id="screen-forecast" class="screen">
-          <div class="section-title">7-Day Risk Forecast</div>
+          <div class="field-header">
+            <div class="section-title">7-Day Risk Forecast</div>
+            <div class="field-actions">
+              <select id="forecast-field-selector" class="field-select">
+                <option value="">Current Location</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="card forecast-summary-card">
+            <div class="card-header">
+              <span class="material-symbols-rounded">analytics</span>
+              <span>Next 7 Days Outlook</span>
+            </div>
+            <p id="forecast-summary-text" class="forecast-summary-text">AI is analyzing current weather patterns for your region...</p>
+          </div>
+
           <p class="forecast-subtitle">AI-predicted crop risks for your region</p>
 
           <div class="forecast-timeline" id="forecast-timeline">
@@ -207,7 +181,6 @@
         <!-- Screen: Advice (Now acts as History List) -->
         <section id="screen-advice" class="screen">
           <div class="section-title">Scan History</div>
-          <p class="forecast-subtitle">Recent diagnoses from the Neon database</p>
           
           <div id="history-container" class="history-list">
              <div class="loading-state">
@@ -223,7 +196,7 @@
       <nav class="bottom-nav">
         <a href="#" class="nav-item active" data-target="dashboard">
           <span class="material-symbols-rounded">grid_view</span>
-          <span class="nav-label">Home</span>
+          <span class="nav-label">Diagnosis</span>
         </a>
         <a href="#" class="nav-item" data-target="field">
           <span class="material-symbols-rounded">sensors</span>
@@ -232,7 +205,7 @@
         <!-- FAB Removed for consolidation -->
         <a href="#" class="nav-item" data-target="advice">
           <span class="material-symbols-rounded">assignment_turned_in</span>
-          <span class="nav-label">Advice</span>
+          <span class="nav-label">History</span>
         </a>
         <a href="#" class="nav-item" data-target="forecast">
           <span class="material-symbols-rounded">timeline</span>
@@ -280,6 +253,7 @@
           <button class="scenario-btn live-btn" data-scenario="live">🌍 Live Weather</button>
           <button class="scenario-btn" data-scenario="healthy">Healthy</button>
           <button class="scenario-btn" data-scenario="drought">Drought</button>
+          <button class="scenario-btn" data-scenario="nutrient">Nutrient Lack</button>
           <button class="scenario-btn" data-scenario="pest">Pest Outbreak</button>
         </div>
         <button id="close-demo" class="outline-btn sm-btn">Close</button>

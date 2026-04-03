@@ -334,6 +334,32 @@ body {
   color: var(--text-muted);
 }
 
+/* --- Field / Forecast Headers --- */
+.field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.field-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.field-select {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary-light);
+  background: white;
+  color: var(--primary-dark);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+}
+
 /* --- Field / Sensors Screen --- */
 .sensor-grid {
   display: grid;
@@ -676,6 +702,23 @@ video.camera-feed {
   margin-bottom: 20px;
 }
 
+.forecast-summary-card {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  color: white;
+  border: none;
+}
+
+.forecast-summary-card .card-header {
+  color: rgba(255,255,255,0.8);
+}
+
+.forecast-summary-text {
+  font-size: 14px;
+  line-height: 1.6;
+  font-style: italic;
+  opacity: 0.95;
+}
+
 .forecast-timeline {
   display: flex;
   flex-direction: column;
@@ -755,10 +798,32 @@ video.camera-feed {
   font-size: 20px;
 }
 
+.day-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 50px;
+}
+
+.rain-chance {
+  font-size: 10px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
 .day-info {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+.day-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 4px;
 }
 
 .day-risk {
@@ -773,6 +838,14 @@ video.camera-feed {
   margin-top: 2px;
 }
 
+.day-tip {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+}
+
 .day-conf {
   font-family: var(--font-display);
   font-size: 16px;
@@ -780,6 +853,109 @@ video.camera-feed {
   color: var(--text-muted);
   min-width: 40px;
   text-align: right;
+}
+
+/* --- History List (Accordion) --- */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-item {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.history-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-icon-box.safe { background: #dcfce7; color: #16a34a; }
+.history-icon-box.danger { background: #fee2e2; color: #ef4444; }
+
+.history-info h4 {
+  margin-bottom: 2px;
+  color: var(--primary-dark);
+  font-size: 15px;
+}
+
+.history-info p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.history-meta {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.history-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.history-item.expanded {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-md);
+}
+
+.history-item.expanded .history-details {
+  max-height: 800px;
+  opacity: 1;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.history-image-wrap {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.history-scan-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-section {
+  margin-bottom: 12px;
+}
+
+.detail-section strong {
+  display: block;
+  font-size: 12px;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+}
+
+.detail-section p {
+  font-size: 13px;
+  color: var(--text-dark);
+  line-height: 1.4;
 }
 
 /* --- Advice Enhancements --- */
